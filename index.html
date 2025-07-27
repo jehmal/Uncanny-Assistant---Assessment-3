@@ -475,12 +475,21 @@
         
         // Adaptive questioning based on user data
         function getAdaptiveQuestion(originalQuestion, field) {
+            // Only apply adaptive questioning once per stage to prevent repeats
+            const adaptiveKey = `adaptive_${currentStage}_${currentQuestion}`;
+            if (userData[adaptiveKey]) {
+                // Already applied adaptive question for this stage/question
+                return originalQuestion;
+            }
+            
             // Age-based adaptation
-            if (userData.date_of_birth) {
+            if (userData.date_of_birth && field === 'financial') {
                 const age = calculateAge(userData.date_of_birth);
-                if (age < 25 && field === 'financial') {
+                userData[adaptiveKey] = true; // Mark as applied
+                
+                if (age < 25) {
                     return "What's your student loan debt? I can help optimize your payments! 💰✨";
-                } else if (age >= 25 && field === 'financial') {
+                } else {
                     return "What's your mortgage balance? I'll find you better rates! 🏠💕";
                 }
             }
@@ -488,6 +497,8 @@
             // Gender-based adaptation
             if (userData.gender && field === 'personal') {
                 const name = userData.name || 'friend';
+                userData[adaptiveKey] = true; // Mark as applied
+                
                 if (userData.gender.toLowerCase().includes('female')) {
                     return `${name}-chan, do you live alone? I need to ensure your magical safety! 🔒✨`;
                 } else {
@@ -497,6 +508,7 @@
             
             // Location-based follow-up
             if (userData.address && field === 'location_detail') {
+                userData[adaptiveKey] = true; // Mark as applied
                 return "What time do you usually leave for work? I'll optimize your schedule! ⏰✨";
             }
             
@@ -622,78 +634,10 @@
             mouthClosed: 'mouth slightly open eyes closed.png'
         };
         
-        // 3D Model initialization
+        // 3D Model initialization - DISABLED for enhanced 2D experience
         function init3DModel() {
-            console.log('Initializing 3D model system...');
-            
-            // Check if Three.js is available
-            if (typeof THREE === 'undefined') {
-                console.error('Three.js not loaded, falling back to 2D');
-                use2DFallback();
-                return;
-            }
-            
-            const canvas = document.getElementById('aikoCanvas');
-            const container = document.getElementById('aikoCharacter');
-            
-            try {
-                // Scene setup
-                scene = new THREE.Scene();
-                scene.background = new THREE.Color(0xf8f8ff); // Light background
-                
-                // Camera setup
-                camera = new THREE.PerspectiveCamera(50, container.offsetWidth / container.offsetHeight, 0.1, 1000);
-                camera.position.set(0, 0, 4);
-                camera.lookAt(0, 0, 0);
-                
-                // Renderer setup
-                renderer = new THREE.WebGLRenderer({ 
-                    canvas: canvas, 
-                    antialias: true, 
-                    alpha: true 
-                });
-                renderer.setSize(container.offsetWidth, container.offsetHeight);
-                renderer.setClearColor(0xf8f8ff, 1);
-                renderer.shadowMap.enabled = true;
-                renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-                
-                // Lighting setup
-                const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
-                scene.add(ambientLight);
-                
-                const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
-                directionalLight.position.set(5, 5, 5);
-                directionalLight.castShadow = true;
-                scene.add(directionalLight);
-                
-                // Add some magical lighting
-                const magicalLight = new THREE.PointLight(0xff69b4, 0.3, 15);
-                magicalLight.position.set(-2, 2, 3);
-                scene.add(magicalLight);
-                
-                console.log('3D scene initialized successfully');
-                
-                // Add a test cube to verify 3D is working
-                addTestCube();
-                
-                // Start animation loop
-                animate();
-                
-                // Load 3D model with timeout fallback
-                loadAikoModel();
-                
-                // Fallback timeout - if model doesn't load in 10 seconds, use 2D
-                setTimeout(() => {
-                    if (!isModelLoaded) {
-                        console.log('Model loading timeout, falling back to 2D');
-                        use2DFallback();
-                    }
-                }, 10000);
-                
-            } catch (error) {
-                console.error('Error initializing 3D system:', error);
-                use2DFallback();
-            }
+            console.log('3D model system disabled - using enhanced 2D for optimal assessment experience');
+            use2DFallbackEnhanced();
         }
         
         function addTestCube() {
@@ -1233,7 +1177,10 @@
             };
             
             if (adaptiveFields[currentStage]) {
+                console.log(`Applying adaptive questioning for stage ${currentStage}, question ${currentQuestion}, field: ${adaptiveFields[currentStage]}`);
+                console.log(`Original text: "${text}"`);
                 text = getAdaptiveQuestion(text, adaptiveFields[currentStage]);
+                console.log(`Adaptive text: "${text}"`);
             }
             
             // Replace placeholders
