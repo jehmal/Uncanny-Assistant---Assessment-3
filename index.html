@@ -446,45 +446,71 @@
             }
         }
         
+        // Track adaptive question types for proper data storage
+        let currentAdaptiveField = null;
+        
         // Adaptive questioning based on user data
         function getAdaptiveQuestion(originalQuestion, field) {
-            // Only apply adaptive questioning once per stage to prevent repeats
-            const adaptiveKey = `adaptive_${currentStage}_${currentQuestion}`;
-            if (userData[adaptiveKey]) {
-                // Already applied adaptive question for this stage/question
+            // Use field-based tracking instead of position-based to prevent repeats
+            const fieldKey = `adaptive_${field}_used`;
+            const stageKey = `stage_${currentStage}_adaptive_applied`;
+            
+            // Check if we already used adaptive questioning for this field or stage
+            if (userData[fieldKey] || userData[stageKey]) {
+                currentAdaptiveField = null; // No adaptive question
                 return originalQuestion;
             }
             
-            // Age-based adaptation
+            // Age-based financial adaptation
             if (userData.date_of_birth && field === 'financial') {
                 const age = calculateAge(userData.date_of_birth);
-                userData[adaptiveKey] = true; // Mark as applied
+                
+                // Mark both field and stage as used
+                userData[fieldKey] = true;
+                userData[stageKey] = true;
                 
                 if (age < 25) {
+                    userData.student_loan_asked = true;
+                    currentAdaptiveField = 'student_loan_debt';
                     return "What's your student loan debt? I can help optimize your payments! 💰✨";
                 } else {
+                    userData.mortgage_asked = true;
+                    currentAdaptiveField = 'mortgage_balance';
                     return "What's your mortgage balance? I'll find you better rates! 🏠💕";
                 }
             }
             
-            // Gender-based adaptation
+            // Gender-based personal adaptation
             if (userData.gender && field === 'personal') {
                 const name = userData.name || 'friend';
-                userData[adaptiveKey] = true; // Mark as applied
+                
+                // Mark both field and stage as used
+                userData[fieldKey] = true;
+                userData[stageKey] = true;
                 
                 if (userData.gender.toLowerCase().includes('female')) {
+                    userData.living_situation_asked = true;
+                    currentAdaptiveField = 'living_situation';
                     return `${name}-chan, do you live alone? I need to ensure your magical safety! 🔒✨`;
                 } else {
+                    userData.relationship_status_asked = true;
+                    currentAdaptiveField = 'relationship_status';
                     return `${name}-kun, what's your relationship status? I want to understand your social network! 💕`;
                 }
             }
             
-            // Location-based follow-up
+            // Location-based follow-up adaptation
             if (userData.address && field === 'location_detail') {
-                userData[adaptiveKey] = true; // Mark as applied
+                // Mark both field and stage as used
+                userData[fieldKey] = true;
+                userData[stageKey] = true;
+                userData.schedule_asked = true;
+                currentAdaptiveField = 'work_schedule';
+                
                 return "What time do you usually leave for work? I'll optimize your schedule! ⏰✨";
             }
             
+            currentAdaptiveField = null; // No adaptive question
             return originalQuestion;
         }
         
@@ -926,15 +952,16 @@
             const question = stages[currentStage].questions[currentQuestion];
             let text = question.text;
             
-            // Apply adaptive questioning
+            // Apply adaptive questioning - only once per stage
             const adaptiveFields = {
-                2: 'financial', // Stage 2 can be financial
-                3: 'personal',  // Stage 3 can be personal  
-                4: 'location_detail' // Stage 4 can be location detail
+                1: 'financial', // Stage 1 can be financial (after we have age)
+                2: 'personal',  // Stage 2 can be personal (after we have gender)
+                3: 'location_detail' // Stage 3 can be location detail (after we have address)
             };
             
-            if (adaptiveFields[currentStage]) {
-                console.log(`Applying adaptive questioning for stage ${currentStage}, question ${currentQuestion}, field: ${adaptiveFields[currentStage]}`);
+            if (adaptiveFields[currentStage] && currentQuestion === 0) {
+                // Only apply adaptive questioning to the first question of eligible stages
+                console.log(`Applying adaptive questioning for stage ${currentStage}, field: ${adaptiveFields[currentStage]}`);
                 console.log(`Original text: "${text}"`);
                 text = getAdaptiveQuestion(text, adaptiveFields[currentStage]);
                 console.log(`Adaptive text: "${text}"`);
@@ -982,9 +1009,13 @@
                 return;
             }
             
-            // Store data
+            // Store data - use adaptive field if adaptive question was asked
             const question = stages[currentStage].questions[currentQuestion];
-            userData[question.field] = value;
+            const fieldToUse = currentAdaptiveField || question.field;
+            userData[fieldToUse] = value;
+            
+            // Clear adaptive field tracker for next question
+            currentAdaptiveField = null;
             
             // Save to persistent storage
             saveUserData();
