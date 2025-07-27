@@ -4,20 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aiko - Your Magical AI Life Assistant ✨</title>
-    <!-- 
-    TO ENABLE 3D MODEL:
-    1. Upload this folder to GitHub Pages, or
-    2. Run a local server: python -m http.server 8000
-    3. Then visit: http://localhost:8000
-    
-    For now: Enhanced 2D animations work perfectly for your assessment!
-    -->
-    <!-- Three.js for 3D model support - using consistent CDN sources -->
-    <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
-    <script src="https://unpkg.com/three@0.128.0/examples/js/libs/fflate.min.js"></script>
-    <script src="https://unpkg.com/three@0.128.0/examples/js/curves/NURBSCurve.js"></script>
-    <script src="https://unpkg.com/three@0.128.0/examples/js/curves/NURBSUtils.js"></script>
-    <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/FBXLoader.js"></script>
     <style>
         * {
             margin: 0;
@@ -105,12 +91,6 @@
             max-height: 100%;
         }
 
-        /* 3D Canvas styling */
-        #aikoCanvas {
-            width: 100%;
-            height: 100%;
-            border-radius: 20px;
-        }
 
         /* Trust meter */
         .trust-meter {
@@ -324,10 +304,7 @@
     <div class="container">
         <div class="character-container">
             <div id="aikoCharacter">
-                <!-- 3D model canvas -->
-                <canvas id="aikoCanvas"></canvas>
-                <!-- Fallback image (hidden by default) -->
-                <img src="aiko-character.png" alt="Aiko" id="aikoImage" style="display: none;" onerror="handleImageError()">
+                <img src="aiko-character.png" alt="Aiko" id="aikoImage" onerror="handleImageError()">
             </div>
             
             <div class="trust-meter">
@@ -409,10 +386,6 @@
         let talkingInterval = null;
         let isReturningUser = false;
         let visitCount = 0;
-        
-        // 3D Model variables
-        let scene, camera, renderer, aikoModel, mixer;
-        let isModelLoaded = false;
         
         // Voice queue system
         let voiceQueue = [];
@@ -634,142 +607,9 @@
             mouthClosed: 'mouth slightly open eyes closed.png'
         };
         
-        // 3D Model initialization - DISABLED for enhanced 2D experience
-        function init3DModel() {
-            console.log('3D model system disabled - using enhanced 2D for optimal assessment experience');
-            use2DFallbackEnhanced();
-        }
-        
-        function addTestCube() {
-            // Add a simple test cube to verify 3D rendering works
-            const geometry = new THREE.BoxGeometry(1, 1, 1);
-            const material = new THREE.MeshLambertMaterial({ 
-                color: 0xff69b4,
-                transparent: true,
-                opacity: 0.7
-            });
-            
-            const cube = new THREE.Mesh(geometry, material);
-            cube.position.set(0, 0, 0);
-            cube.rotation.x = 0.5;
-            cube.rotation.y = 0.5;
-            cube.name = 'testCube';
-            scene.add(cube);
-            
-            console.log('Test cube added to scene');
-            
-            // Animate the test cube
-            function animateTestCube() {
-                cube.rotation.x += 0.01;
-                cube.rotation.y += 0.01;
-            }
-            
-            // Store animation function for cleanup
-            window.testCubeAnimation = animateTestCube;
-        }
-        
-        function loadAikoModel() {
-            console.log('Initializing FBX loader...');
-            
-            // Check if we're running locally (file://) which causes CORS issues
-            if (window.location.protocol === 'file:') {
-                console.warn('Running locally - CORS will block FBX loading. Use a web server or upload to GitHub Pages for 3D model.');
-                console.log('For now, using enhanced 2D fallback with animations');
-                use2DFallbackEnhanced();
-                return;
-            }
-            
-            // Wait a moment for all scripts to load
-            setTimeout(() => {
-                // Check if required libraries are loaded
-                if (!THREE.FBXLoader) {
-                    console.error('FBXLoader not available, falling back to 2D');
-                    use2DFallback();
-                    return;
-                }
-                
-                if (typeof fflate === 'undefined') {
-                    console.error('fflate library not loaded, falling back to 2D');
-                    use2DFallback();
-                    return;
-                }
-                
-                console.log('All dependencies loaded successfully!');
-                
-                const loader = new THREE.FBXLoader();
-                console.log('FBX loader created, attempting to load model...');
-                
-                // Try to load the FBX model
-                loader.load('Magical_Star_Guardian_0727065138_texture.fbx', 
-                    // Success callback
-                    function(object) {
-                        console.log('Model loaded successfully!', object);
-                        aikoModel = object;
-                        
-                        // Scale and position the model (adjust as needed)
-                        aikoModel.scale.setScalar(0.005); // Smaller scale to start
-                        aikoModel.position.set(0, -1.5, 0);
-                        aikoModel.rotation.y = 0;
-                        
-                        // Setup animations if available
-                        if (object.animations && object.animations.length > 0) {
-                            console.log('Found animations:', object.animations.length);
-                            mixer = new THREE.AnimationMixer(object);
-                            
-                            // Play the first animation if available
-                            const action = mixer.clipAction(object.animations[0]);
-                            action.play();
-                        }
-                        
-                        // Add to scene
-                        scene.add(aikoModel);
-                        isModelLoaded = true;
-                        
-                        // Remove test cube now that model is loaded
-                        const testCube = scene.getObjectByName('testCube');
-                        if (testCube) {
-                            scene.remove(testCube);
-                        }
-                        window.testCubeAnimation = null;
-                        
-                        console.log('3D Aiko model added to scene successfully!');
-                        
-                        // Show the 3D canvas
-                        document.getElementById('aikoCanvas').style.display = 'block';
-                        document.getElementById('aikoImage').style.display = 'none';
-                        
-                    }, 
-                    // Progress callback
-                    function(progress) {
-                        if (progress.total > 0) {
-                            const percent = (progress.loaded / progress.total * 100).toFixed(1);
-                            console.log(`Loading progress: ${percent}%`);
-                        } else {
-                            console.log('Loading progress:', progress.loaded, 'bytes loaded');
-                        }
-                    }, 
-                    // Error callback
-                    function(error) {
-                        console.error('Error loading 3D model:', error);
-                        console.log('Falling back to 2D images');
-                        use2DFallback();
-                    }
-                );
-            }, 1000); // Wait 1 second for all dependencies to load
-        }
-        
-        function use2DFallback() {
-            console.log('Using 2D image fallback');
-            document.getElementById('aikoCanvas').style.display = 'none';
-            document.getElementById('aikoImage').style.display = 'block';
-            isModelLoaded = false;
-        }
-        
-        function use2DFallbackEnhanced() {
-            console.log('Using enhanced 2D image fallback with CSS animations');
-            document.getElementById('aikoCanvas').style.display = 'none';
-            document.getElementById('aikoImage').style.display = 'block';
-            isModelLoaded = false;
+        // Enhanced 2D initialization
+        function initEnhanced2D() {
+            console.log('Using enhanced 2D animations - perfect for your assessment!');
             
             // Add enhanced CSS animations to the 2D image
             const img = document.getElementById('aikoImage');
@@ -784,89 +624,16 @@
                 img.style.transform = `scale(${scale}) translateY(${Math.sin(breathingPhase * 0.7) * 2}px)`;
             }, 100);
             
-            console.log('Enhanced 2D animations active - perfect for your critical design project!');
+            console.log('Enhanced 2D animations active!');
         }
         
-        function animate() {
-            requestAnimationFrame(animate);
-            
-            if (mixer) {
-                mixer.update(0.01);
-            }
-            
-            // Gentle rotation for the model
-            if (aikoModel && isModelLoaded) {
-                aikoModel.rotation.y += 0.005;
-            }
-            
-            // Animate test cube if present
-            if (window.testCubeAnimation && !isModelLoaded) {
-                window.testCubeAnimation();
-            }
-            
-            if (renderer && scene && camera) {
-                renderer.render(scene, camera);
-            }
-        }
-        
-        // Animation functions (works with both 3D and 2D)
+        // Animation functions for 2D
         function startTalkingAnimation() {
-            if (isModelLoaded && aikoModel) {
-                // 3D model talking animation
-                start3DTalkingAnimation();
-            } else {
-                // 2D image talking animation
-                start2DTalkingAnimation();
-            }
+            start2DTalkingAnimation();
         }
         
         function stopTalkingAnimation() {
-            if (isModelLoaded && aikoModel) {
-                // Stop 3D animation
-                stop3DTalkingAnimation();
-            } else {
-                // Stop 2D animation
-                stop2DTalkingAnimation();
-            }
-        }
-        
-        function start3DTalkingAnimation() {
-            // Clear any existing animation
-            if (talkingInterval) {
-                clearInterval(talkingInterval);
-            }
-            
-            // 3D talking animation - subtle head movement and scaling
-            let animationPhase = 0;
-            talkingInterval = setInterval(() => {
-                if (aikoModel) {
-                    animationPhase += 0.3;
-                    
-                    // Subtle head bob
-                    aikoModel.position.y = -1 + Math.sin(animationPhase) * 0.02;
-                    
-                    // Slight scale variation for "breathing"
-                    const scale = 0.01 + Math.sin(animationPhase * 0.5) * 0.001;
-                    aikoModel.scale.setScalar(scale);
-                    
-                    // Gentle head rotation
-                    aikoModel.rotation.x = Math.sin(animationPhase * 0.7) * 0.05;
-                }
-            }, 50); // Smooth 20fps animation
-        }
-        
-        function stop3DTalkingAnimation() {
-            if (talkingInterval) {
-                clearInterval(talkingInterval);
-                talkingInterval = null;
-            }
-            
-            // Return to default position
-            if (aikoModel) {
-                aikoModel.position.y = -1;
-                aikoModel.scale.setScalar(0.01);
-                aikoModel.rotation.x = 0;
-            }
+            stop2DTalkingAnimation();
         }
         
         function start2DTalkingAnimation() {
@@ -940,8 +707,8 @@
             loadUserData(); // Load persistent data first
             createParticles();
             
-            // Initialize 3D model
-            init3DModel();
+            // Initialize enhanced 2D animations
+            initEnhanced2D();
             
             // Add click handler to enable audio (required by browsers)
             document.addEventListener('click', function enableAudio() {
@@ -960,16 +727,6 @@
             showCurrentQuestion();
             updateSurveillanceTerminal();
         };
-        
-        // Handle window resize for 3D canvas
-        window.addEventListener('resize', function() {
-            if (renderer && camera) {
-                const container = document.getElementById('aikoCharacter');
-                camera.aspect = container.offsetWidth / container.offsetHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(container.offsetWidth, container.offsetHeight);
-            }
-        });
         
         // Create floating particles
         function createParticles() {
