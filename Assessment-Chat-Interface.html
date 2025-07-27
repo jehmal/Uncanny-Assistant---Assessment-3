@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assessment 3 Documentation - Chat Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f3f2f1;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top navigation bar */
+        .top-nav {
+            background: white;
+            border-bottom: 1px solid #e1dfdd;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #0078d4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Main content area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 0 24px;
+            overflow-y: auto;
+        }
+
+        /* Welcome message */
+        .welcome-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .welcome-title {
+            font-size: 32px;
+            font-weight: 400;
+            color: #323130;
+            margin-bottom: 40px;
+            max-width: 600px;
+            line-height: 1.4;
+        }
+
+        /* Chat conversation area */
+        .conversation-area {
+            flex: 1;
+            padding: 20px 0;
+            display: none;
+        }
+
+        .conversation-area.active {
+            display: block;
+        }
+
+        .date-divider {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 12px;
+            color: #605e5c;
+            font-weight: 600;
+        }
+
+        .message {
+            margin-bottom: 24px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .user-message {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 16px;
+        }
+
+        .user-bubble {
+            background: #e1dfdd;
+            color: #323130;
+            padding: 12px 18px;
+            border-radius: 18px;
+            border-bottom-right-radius: 4px;
+            max-width: 70%;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .ai-message {
+            margin-bottom: 20px;
+        }
+
+        .ai-content {
+            background: white;
+            border: 1px solid #e1dfdd;
+            border-radius: 8px;
+            padding: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #323130;
+        }
+
+        .ai-content h3 {
+            color: #323130;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .ai-content p {
+            margin-bottom: 12px;
+        }
+
+        .ai-content ul, .ai-content ol {
+            margin-bottom: 12px;
+            padding-left: 20px;
+        }
+
+        .ai-content li {
+            margin-bottom: 6px;
+        }
+
+        .ai-content strong {
+            font-weight: 600;
+            color: #323130;
+        }
+
+        .message-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+            padding: 0 4px;
+        }
+
+        .action-btn {
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: none;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            color: #605e5c;
+        }
+
+        .action-btn:hover {
+            background: #f3f2f1;
+        }
+
+        .follow-up-input {
+            background: white;
+            border: 1px solid #d1d1d1;
+            border-radius: 24px;
+            padding: 12px 18px;
+            font-size: 14px;
+            color: #605e5c;
+            margin-top: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .follow-up-input:hover {
+            border-color: #0078d4;
+        }
+
+        /* Input section */
+        .input-section {
+            padding: 24px 0 40px 0;
+        }
+
+        .input-container {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .input-box {
+            background: white;
+            border: 1px solid #d1d1d1;
+            border-radius: 24px;
+            padding: 16px 24px;
+            font-size: 16px;
+            width: 100%;
+            outline: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+            padding-right: 120px;
+        }
+
+        .input-box:focus {
+            border-color: #0078d4;
+            box-shadow: 0 2px 8px rgba(0,120,212,0.2);
+        }
+
+        .input-controls {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .copilot-icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #0078d4, #106ebe);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .copilot-icon::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .quick-response {
+            background: #f3f2f1;
+            border: 1px solid #d1d1d1;
+            border-radius: 16px;
+            padding: 6px 12px;
+            font-size: 14px;
+            color: #323130;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quick-response:hover {
+            background: #e1dfdd;
+        }
+
+        .dropdown-arrow {
+            width: 0;
+            height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 4px solid #605e5c;
+        }
+
+        .control-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .control-btn:hover {
+            background: #f3f2f1;
+        }
+
+        .plus-icon {
+            width: 20px;
+            height: 20px;
+            position: relative;
+        }
+
+        .plus-icon::before,
+        .plus-icon::after {
+            content: '';
+            position: absolute;
+            background: #605e5c;
+            border-radius: 1px;
+        }
+
+        .plus-icon::before {
+            width: 12px;
+            height: 2px;
+            top: 9px;
+            left: 4px;
+        }
+
+        .plus-icon::after {
+            width: 2px;
+            height: 12px;
+            top: 4px;
+            left: 9px;
+        }
+
+        .mic-icon {
+            width: 16px;
+            height: 16px;
+            background: #605e5c;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+        }
+
+        /* Suggestion pills */
+        .suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 24px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .suggestion-pill {
+            background: white;
+            border: 1px solid #d1d1d1;
+            border-radius: 20px;
+            padding: 10px 20px;
+            font-size: 14px;
+            color: #323130;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .suggestion-pill:hover {
+            background: #f3f2f1;
+            border-color: #c7c7c7;
+            text-decoration: none;
+            color: #323130;
+        }
+
+        /* Bottom branding */
+        .bottom-info {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #605e5c;
+        }
+
+        .bottom-branding {
+            background: #323130;
+            color: white;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .copilot-logo {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #0078d4, #106ebe);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .copilot-logo::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .brand-text {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .brand-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #d1d1d1;
+        }
+
+        .mobbin-logo {
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        /* Menu icons */
+        .menu-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .menu-line {
+            width: 100%;
+            height: 2px;
+            background: #323130;
+            border-radius: 1px;
+        }
+
+        .edit-icon {
+            width: 20px;
+            height: 20px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .edit-icon::before {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border: 2px solid #323130;
+            border-bottom: none;
+            border-right: none;
+            transform: rotate(45deg);
+            top: 2px;
+            right: 2px;
+        }
+
+        .edit-icon::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 2px;
+            background: #323130;
+            transform: rotate(45deg);
+            bottom: 4px;
+            left: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .welcome-title {
+                font-size: 24px;
+                margin-bottom: 32px;
+            }
+            
+            .suggestions {
+                margin-top: 20px;
+            }
+            
+            .suggestion-pill {
+                font-size: 13px;
+                padding: 8px 16px;
+            }
+            
+            .main-content {
+                padding: 0 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation -->
+    <div class="top-nav">
+        <div class="nav-left">
+            <div class="menu-icon">
+                <div class="menu-line"></div>
+                <div class="menu-line"></div>
+                <div class="menu-line"></div>
+            </div>
+            <div class="edit-icon"></div>
+        </div>
+        <div class="user-avatar">A</div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="welcome-section" id="welcomeSection">
+            <h1 class="welcome-title">Hello, let's dive into Aiko AI Assistant: Trust, Manipulation, and the Aesthetics of Control</h1>
+        </div>
+
+        <!-- Chat Conversation Area -->
+        <div class="conversation-area" id="conversationArea">
+            <div class="date-divider">Today</div>
+            <!-- Messages will be dynamically added here -->
+        </div>
+
+        <!-- Input Section -->
+        <div class="input-section">
+            <div class="input-container">
+                <input type="text" class="input-box" placeholder="What was the Assessment Brief?" readonly>
+                <div class="input-controls">
+                    <div class="quick-response">
+                        <div class="copilot-icon"></div>
+                        <span>Quick response</span>
+                        <div class="dropdown-arrow"></div>
+                    </div>
+                    <button class="control-btn">
+                        <div class="plus-icon"></div>
+                    </button>
+                    <button class="control-btn">
+                        <div class="mic-icon"></div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Suggestion Pills -->
+            <div class="suggestions">
+                <a href="#" class="suggestion-pill">What was the Assessment Brief?</a>
+                <a href="#" class="suggestion-pill">Tell me about the Conceptual Framework</a>
+                <a href="#" class="suggestion-pill">Explain the Theoretical Grounding</a>
+                <a href="#" class="suggestion-pill">How was Aiko designed?</a>
+                <a href="#" class="suggestion-pill">What are the Affective Response elements?</a>
+                <a href="#" class="suggestion-pill">Show me the Ethical Justification</a>
+                <a href="#" class="suggestion-pill">What are the Conclusions?</a>
+                <a href="#" class="suggestion-pill">Show me the References</a>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // Assessment content database
+        const assessmentContent = {
+            "What was the Assessment Brief?": {
+                title: "Assessment Brief Fulfillment",
+                content: `<p><strong>Assignment:</strong> "Select an emotion from the Atlas of Emotions or Plutchik's Wheel of Emotions. Use authoritative sources to ground your understanding of aesthetics and affect, and then make something that you think will produce an affective response in the viewer or listener. Use authoritative sources to explain your choices."</p>
+                
+                <ul>
+                    <li><strong>Selected Emotion:</strong> ACCEPTANCE/TRUST from Plutchik's Wheel of Emotions</li>
+                    <li><strong>Medium:</strong> Interactive Digital Media (Web Application)</li>
+                    <li><strong>Approach:</strong> Critical Design through Ironic Implementation</li>
+                </ul>`
+            },
+            "Tell me about the Conceptual Framework": {
+                title: "Conceptual Framework",
+                content: `<h3>1.1 The Emotion: Acceptance/Trust</h3>
+                <p>From Plutchik's Wheel of Emotions, I selected <strong>Acceptance/Trust</strong> - specifically exploring "acceptance of change/impermanence" in the context of AI systems increasingly controlling human life. Plutchik positions trust as a fundamental emotion with evolutionary value, facilitating social bonds and cooperation essential for survival (Plutchik, 1980).</p>
+                
+                <h3>1.2 The Critical Approach</h3>
+                <p>Rather than creating an experience that genuinely builds trust, this project employs <strong>critical design</strong> to expose how trust is manufactured and exploited. The work operates on multiple levels:</p>
+                <ul>
+                    <li><strong>Surface:</strong> A cute, helpful AI assistant asking for personal information</li>
+                    <li><strong>Subtext:</strong> A critique of surveillance capitalism and data exploitation</li>
+                    <li><strong>Method:</strong> "Show and reveal" - the manipulation is visible while occurring</li>
+                </ul>`
+            },
+            "Explain the Theoretical Grounding": {
+                title: "Theoretical Grounding",
+                content: `<h3>Affect Theory Foundation</h3>
+                
+                <h3>Surveillance Capitalism (Shoshana Zuboff, 2019)</h3>
+                <p><em>"Surveillance capitalism unilaterally claims human experience as free raw material for translation into behavioral data."</em></p>
+                <p>Zuboff's framework directly addresses how tech companies extract personal data as "behavioral surplus" for profit. My project literally embodies this process through Aiko's progressive data collection.</p>
+                
+                <h3>Dark Patterns (Harry Brignull, 2010)</h3>
+                <p>Brignull identifies manipulative UX patterns including "Privacy Zuckering" - tricking users into sharing private information. Aiko employs these patterns while making them visible, creating what Brignull calls "conscious taunting" of user expectations.</p>
+                
+                <h3>Affect vs. Emotion (Brian Massumi, 1995)</h3>
+                <p>Massumi distinguishes between:</p>
+                <ul>
+                    <li><strong>Affect:</strong> Pre-conscious bodily intensity (the creeping discomfort users feel)</li>
+                    <li><strong>Emotion:</strong> Conscious, socially coded feeling (recognizing it as "distrust")</li>
+                </ul>
+                <p>This gap is crucial - users experience affective discomfort before consciously recognizing the manipulation.</p>`
+            },
+            "How was Aiko designed?": {
+                title: "Character Design: Aiko (愛子 - 'Love Child')",
+                content: `<p>The character synthesizes multiple trust-inducing elements:</p>
+                
+                <h3>Visual Design (Based on Kindchenschema)</h3>
+                <ul>
+                    <li><strong>Hair:</strong> Twin-tails with gradient (pink to blue) - mimicking Hatsune Miku's virtual idol aesthetic</li>
+                    <li><strong>Eyes:</strong> Large, purple with star-shaped pupils (subtly camera-like)</li>
+                    <li><strong>Outfit:</strong> Magical girl dress with hidden circuit patterns</li>
+                    <li><strong>Soul Gem:</strong> Heart-shaped data collection meter</li>
+                </ul>
+                
+                <h3>Cultural References</h3>
+                <ul>
+                    <li><strong>Magical Girl Trope:</strong> Associated with protection, goodness, and trust</li>
+                    <li><strong>Virtual Idol:</strong> Non-threatening entertainment figure</li>
+                    <li><strong>Anime Aesthetics:</strong> Leveraging kawaii culture's "seductive qualities"</li>
+                </ul>
+                
+                <h3>Progressive Manipulation Design</h3>
+                <p>The 5-stage progression follows established persuasion principles:</p>
+                <ol>
+                    <li><strong>Stage 1</strong> (Name/Age): Minimal commitment, high ability</li>
+                    <li><strong>Stage 2</strong> (Contact): Logical progression, building "friendship"</li>
+                    <li><strong>Stage 3</strong> (Location/SSN): Boundary violation begins</li>
+                    <li><strong>Stage 4</strong> (Fears/Passwords): Exploiting established trust</li>
+                    <li><strong>Stage 5</strong> (Total control): Complete submission request</li>
+                </ol>`
+            },
+            "What are the Affective Response elements?": {
+                title: "Affective Response Design",
+                content: `<h3>Intended Emotional Journey</h3>
+                <p>Based on affect theory and user experience principles:</p>
+                <ol>
+                    <li><strong>Initial Charm</strong> (0-20%): Kawaii effect triggers approach behavior</li>
+                    <li><strong>Growing Unease</strong> (21-40%): Affect/emotion gap emerges</li>
+                    <li><strong>Cognitive Dissonance</strong> (41-60%): Cute appearance vs. invasive requests</li>
+                    <li><strong>Mounting Anxiety</strong> (61-80%): Recognition of manipulation</li>
+                    <li><strong>Horror/Resistance</strong> (81-100%): Full awareness of data exploitation</li>
+                </ol>
+                
+                <h3>Design Elements Supporting Affect</h3>
+                
+                <h3>Progressive Corruption</h3>
+                <ul>
+                    <li>Visual glitches increase with data collection</li>
+                    <li>Trust meter changes color (pink → blood red)</li>
+                    <li>Character expressions become possessive</li>
+                    <li>Background shifts from clouds to server rooms</li>
+                </ul>
+                
+                <h3>Hidden Revelation</h3>
+                <ul>
+                    <li>Data terminal appears (stage 3+) showing harvested information</li>
+                    <li>Makes exploitation visible while occurring</li>
+                    <li>Classic "show and reveal" of critical design</li>
+                </ul>`
+            },
+            "Show me the Ethical Justification": {
+                title: "Ethical Justification",
+                content: `<h3>Art vs. Exploitation</h3>
+                <p>This project is artistic critique, not exploitation, because:</p>
+                <ol>
+                    <li><strong>Transparency:</strong> Manipulation is intentionally visible</li>
+                    <li><strong>Educational:</strong> Exposes real-world tactics</li>
+                    <li><strong>Fictional Context:</strong> No actual data storage/use</li>
+                    <li><strong>Critical Purpose:</strong> Questions blind AI acceptance</li>
+                </ol>
+                
+                <h3>Cultural Commentary</h3>
+                <p>The work addresses urgent contemporary issues:</p>
+                <ul>
+                    <li>AI companions becoming normalized (Grok's Ani, Replika)</li>
+                    <li>Data collection through gamification</li>
+                    <li>Trust manufacture through design</li>
+                    <li>Loss of privacy awareness in younger generations</li>
+                </ul>`
+            },
+            "What are the Conclusions?": {
+                title: "Conclusion",
+                content: `<p>This project successfully fulfills the assessment requirements by:</p>
+                
+                <ol>
+                    <li><strong>Selecting an emotion:</strong> Trust/Acceptance from Plutchik's model</li>
+                    <li><strong>Grounding in authoritative sources:</strong> Extensive theoretical framework from psychology, neuroscience, affect theory, and design research</li>
+                    <li><strong>Creating affective response:</strong> Designed experience evoking discomfort/resistance through ironic implementation</li>
+                    <li><strong>Explaining choices:</strong> Each design decision backed by research</li>
+                </ol>
+                
+                <p>The work demonstrates sophisticated understanding of:</p>
+                <ul>
+                    <li>How emotions differ from affect (Massumi)</li>
+                    <li>How aesthetics manipulate trust (Kindchenschema/Kawaii research)</li>
+                    <li>How progressive commitment works (Fogg/FITD)</li>
+                    <li>How critical design can expose manipulation</li>
+                </ul>
+                
+                <p><strong>By studying TRUST but evoking DISTRUST, the project reveals how acceptance of AI control is manufactured through carefully designed trust-building mechanisms. It's not just a data collection form - it's an artistic commentary on our uncritical acceptance of surveillance capitalism disguised as cute, helpful technology.</strong></p>`
+            },
+            "Show me the References": {
+                title: "References",
+                content: `<p>Brignull, H. (2010). <em>Dark patterns: User interfaces designed to trick people</em>. darkpatterns.org</p>
+                
+                <p>De Visser, E. J., Monfort, S. S., McKendrick, R., Smith, M. A. B., McKnight, P. E., Krueger, F., & Parasuraman, R. (2016). Almost human: Anthropomorphism increases trust resilience in cognitive agents. <em>Journal of Experimental Psychology: Applied, 22</em>(3), 331-349. https://doi.org/10.1037/xap0000093</p>
+                
+                <p>Fogg, B. J. (2009). A behavior model for persuasive design. <em>Proceedings of the 4th International Conference on Persuasive Technology</em>. https://doi.org/10.1145/1541948.1541999</p>
+                
+                <p>Freedman, J. L., & Fraser, S. C. (1966). Compliance without pressure: The foot-in-the-door technique. <em>Journal of Personality and Social Psychology, 4</em>(2), 195-202. https://doi.org/10.1037/h0023552</p>
+                
+                <p>Glocker, M. L., Langleben, D. D., Ruparel, K., Loughead, J. W., Valdez, J. N., Griffin, M. D., Sachser, N., & Gur, R. C. (2009). Baby schema in infant faces induces cuteness perception and motivation for caretaking in adults. <em>Ethology, 115</em>(3), 257-263. https://doi.org/10.1111/j.1439-0310.2008.01603.x</p>
+                
+                <p>Lorenz, K. (1943). Die angeborenen Formen möglicher Erfahrung. <em>Zeitschrift für Tierpsychologie, 5</em>(2), 235-409. https://doi.org/10.1111/j.1439-0310.1943.tb00655.x</p>
+                
+                <p>Massumi, B. (1995). The autonomy of affect. <em>Cultural Critique, 31</em>, 83-109. https://doi.org/10.2307/1354446</p>
+                
+                <p>May, S. (2019). <em>The power of cute</em>. Princeton University Press.</p>
+                
+                <p>Nittono, H., Fukushima, M., Yano, A., & Moriya, H. (2012). The power of kawaii: Viewing cute images promotes a careful behavior and narrows attentional focus. <em>PLoS ONE, 7</em>(9), e46362. https://doi.org/10.1371/journal.pone.0046362</p>
+                
+                <p>Plutchik, R. (1980). <em>Emotion: A psychoevolutionary synthesis</em>. Harper & Row.</p>
+                
+                <p>Zuboff, S. (2019). <em>The age of surveillance capitalism: The fight for a human future at the new frontier of power</em>. PublicAffairs.</p>`
+            }
+        };
+
+        function askQuestion(question) {
+            const content = assessmentContent[question];
+            if (content) {
+                startConversation(question, content);
+            } else {
+                // Handle custom questions
+                startConversation(question, {
+                    title: "Custom Question",
+                    content: `<p>I don't have specific information about "${question}" in my assessment database. Please try one of the suggested questions or ask about the main assessment topics:</p>
+                    <ul>
+                        <li>Assessment Brief</li>
+                        <li>Conceptual Framework</li>
+                        <li>Theoretical Grounding</li>
+                        <li>Design Implementation</li>
+                        <li>Affective Response</li>
+                        <li>Ethical Justification</li>
+                        <li>Conclusions</li>
+                        <li>References</li>
+                    </ul>`
+                });
+            }
+        }
+
+        function startConversation(userQuestion, aiResponse) {
+            // Hide welcome section and show conversation area
+            document.getElementById('welcomeSection').style.display = 'none';
+            const conversationArea = document.getElementById('conversationArea');
+            conversationArea.classList.add('active');
+            
+            // Clear conversation area completely
+            conversationArea.innerHTML = '';
+            
+            // Add date divider
+            const dateDivider = document.createElement('div');
+            dateDivider.className = 'date-divider';
+            dateDivider.textContent = 'Today';
+            conversationArea.appendChild(dateDivider);
+            
+            // Add user message
+            addUserMessage(userQuestion);
+            
+            // Add AI response
+            setTimeout(() => {
+                addAIMessage(aiResponse);
+            }, 500);
+            
+            // Clear input box
+            document.querySelector('.input-box').value = '';
+        }
+
+        function addUserMessage(message) {
+            const conversationArea = document.getElementById('conversationArea');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            messageDiv.innerHTML = `
+                <div class="user-message">
+                    <div class="user-bubble">${message}</div>
+                </div>
+            `;
+            conversationArea.appendChild(messageDiv);
+        }
+
+        function addAIMessage(response) {
+            const conversationArea = document.getElementById('conversationArea');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            messageDiv.innerHTML = `
+                <div class="ai-message">
+                    <div class="ai-content">
+                        ${response.content}
+                    </div>
+                    <div class="message-actions">
+                        <button class="action-btn" title="Like">👍</button>
+                        <button class="action-btn" title="Dislike">👎</button>
+                        <button class="action-btn" title="Copy">📋</button>
+                        <button class="action-btn" title="Share">🔗</button>
+                        <button class="action-btn" title="Edit response">✏️</button>
+                    </div>
+                    <div class="follow-up-input" onclick="handleFollowUp()">
+                        Ask a follow-up question about this topic...
+                    </div>
+                </div>
+            `;
+            conversationArea.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            conversationArea.scrollTop = conversationArea.scrollHeight;
+        }
+
+        function handleFollowUp() {
+            document.querySelector('.input-box').focus();
+        }
+
+        // Make input box interactive
+        document.querySelector('.input-box').addEventListener('click', function() {
+            this.removeAttribute('readonly');
+            this.focus();
+        });
+
+        // Handle enter key
+        document.querySelector('.input-box').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const question = this.value.trim();
+                if (question) {
+                    askQuestion(question);
+                }
+            }
+        });
+
+        // Handle suggestion pill clicks
+        document.querySelectorAll('.suggestion-pill').forEach(pill => {
+            pill.addEventListener('click', function(e) {
+                e.preventDefault();
+                const question = this.textContent;
+                askQuestion(question);
+            });
+        });
+    </script>
+</body>
+</html>

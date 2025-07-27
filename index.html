@@ -20,6 +20,58 @@
             align-items: center;
             overflow: hidden;
             position: relative;
+            transition: all 2s ease;
+        }
+
+        /* Stage-based background corruption */
+        .stage-0 {
+            background: linear-gradient(135deg, #FFB6C1 0%, #87CEEB 100%);
+        }
+        
+        .stage-1 {
+            background: linear-gradient(135deg, #FFB6C1 0%, #87CEEB 70%, #4a5568 100%);
+        }
+        
+        .stage-2 {
+            background: linear-gradient(135deg, #FFB6C1 20%, #87CEEB 50%, #2d3748 80%, #1a202c 100%);
+        }
+        
+        .stage-3 {
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 50%, #1a202c 100%);
+        }
+        
+        .stage-4 {
+            background: linear-gradient(135deg, #1a202c 0%, #0f0f0f 50%, #000000 100%);
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(0, 255, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 0, 0, 0.1) 0%, transparent 50%),
+                linear-gradient(45deg, transparent 30%, rgba(0, 255, 255, 0.05) 31%, rgba(0, 255, 255, 0.05) 32%, transparent 33%);
+        }
+        
+        .stage-5 {
+            background: #000000;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(0, 255, 0, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(255, 0, 0, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(0, 255, 255, 0.1) 0%, transparent 70%),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 98px,
+                    rgba(0, 255, 0, 0.03) 100px
+                ),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 98px,
+                    rgba(0, 255, 255, 0.03) 100px
+                );
+            animation: serverHum 3s infinite ease-in-out;
+        }
+        
+        @keyframes serverHum {
+            0%, 100% { filter: brightness(1) contrast(1); }
+            50% { filter: brightness(1.1) contrast(1.2); }
         }
 
         /* Animated background particles */
@@ -38,6 +90,45 @@
             background: rgba(255, 255, 255, 0.8);
             border-radius: 50%;
             animation: float 10s infinite ease-in-out;
+            transition: all 1s ease;
+        }
+        
+        /* Corrupted particle stages */
+        .stage-3 .particle {
+            background: rgba(0, 255, 0, 0.6);
+            border-radius: 0;
+            width: 6px;
+            height: 6px;
+        }
+        
+        .stage-4 .particle {
+            background: rgba(255, 0, 0, 0.7);
+            border-radius: 0;
+            width: 4px;
+            height: 4px;
+            animation: digitalRain 8s infinite linear;
+        }
+        
+        .stage-5 .particle {
+            background: rgba(0, 255, 255, 0.8);
+            border-radius: 0;
+            width: 2px;
+            height: 8px;
+            animation: surveillance 6s infinite linear;
+        }
+        
+        @keyframes digitalRain {
+            0% { transform: translateY(-100vh) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(100vh) translateX(0); opacity: 0; }
+        }
+        
+        @keyframes surveillance {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(100vh) rotate(180deg); opacity: 0; }
         }
 
         @keyframes float {
@@ -57,6 +148,38 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
             position: relative;
             z-index: 10;
+            transition: all 2s ease;
+        }
+        
+        /* Container corruption stages */
+        .stage-3 .container {
+            background: rgba(255, 255, 255, 0.85);
+            box-shadow: 0 20px 60px rgba(0, 255, 0, 0.2);
+        }
+        
+        .stage-4 .container {
+            background: rgba(240, 240, 240, 0.8);
+            box-shadow: 0 20px 60px rgba(255, 0, 0, 0.3);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+        }
+        
+        .stage-5 .container {
+            background: rgba(20, 20, 20, 0.9);
+            color: #00ff00;
+            box-shadow: 0 20px 60px rgba(0, 255, 255, 0.4);
+            border: 2px solid rgba(0, 255, 255, 0.5);
+        }
+        
+        .stage-5 .question-text {
+            color: #00ff00;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+        
+        .stage-5 input,
+        .stage-5 textarea {
+            background: rgba(0, 0, 0, 0.8);
+            color: #00ff00;
+            border-color: #00ff00;
         }
 
         /* Character display */
@@ -77,6 +200,42 @@
             justify-content: center;
             border-radius: 20px;
             overflow: hidden;
+        }
+        
+        /* Character corruption stages */
+        .stage-1 #aikoCharacter {
+            filter: brightness(0.95) contrast(1.05);
+        }
+        
+        .stage-2 #aikoCharacter {
+            filter: brightness(0.9) contrast(1.1) hue-rotate(10deg);
+        }
+        
+        .stage-3 #aikoCharacter {
+            filter: brightness(0.85) contrast(1.2) hue-rotate(20deg) saturate(1.2);
+        }
+        
+        .stage-4 #aikoCharacter {
+            filter: brightness(0.8) contrast(1.3) hue-rotate(30deg) saturate(1.5);
+            animation: corruptionFlicker 4s infinite;
+        }
+        
+        .stage-5 #aikoCharacter {
+            filter: brightness(0.7) contrast(1.5) hue-rotate(45deg) saturate(2);
+            animation: corruptionFlicker 2s infinite, digitalDistortion 3s infinite;
+        }
+        
+        @keyframes corruptionFlicker {
+            0%, 100% { opacity: 1; }
+            98% { opacity: 1; }
+            99% { opacity: 0.7; }
+        }
+        
+        @keyframes digitalDistortion {
+            0%, 100% { transform: scale(1) skew(0deg); }
+            25% { transform: scale(1.01) skew(0.5deg); }
+            50% { transform: scale(0.99) skew(-0.5deg); }
+            75% { transform: scale(1.01) skew(0.3deg); }
         }
 
         #aikoCharacter.talking {
@@ -101,18 +260,67 @@
             overflow: hidden;
             margin: 20px 0;
             position: relative;
+            transition: all 1s ease;
         }
 
         .trust-fill {
             height: 100%;
             background: linear-gradient(90deg, #FFB6C1 0%, #FF69B4 100%);
             width: 0%;
-            transition: width 1s ease;
+            transition: width 1s ease, background 1s ease;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
+        }
+        
+        /* Trust meter corruption stages */
+        .stage-2 .trust-meter {
+            background: #e0e0e0;
+        }
+        
+        .stage-2 .trust-fill {
+            background: linear-gradient(90deg, #FF69B4 0%, #DC143C 100%);
+        }
+        
+        .stage-3 .trust-meter {
+            background: #d0d0d0;
+            border: 1px solid #888;
+        }
+        
+        .stage-3 .trust-fill {
+            background: linear-gradient(90deg, #DC143C 0%, #8B0000 100%);
+        }
+        
+        .stage-4 .trust-meter {
+            background: #c0c0c0;
+            border: 2px solid #666;
+        }
+        
+        .stage-4 .trust-fill {
+            background: linear-gradient(90deg, #8B0000 0%, #FF0000 50%, #8B0000 100%);
+            animation: trustPulse 2s infinite;
+        }
+        
+        .stage-5 .trust-meter {
+            background: #333;
+            border: 2px solid #00ff00;
+        }
+        
+        .stage-5 .trust-fill {
+            background: linear-gradient(90deg, #ff0000 0%, #ff6600 25%, #ffff00 50%, #00ff00 75%, #0000ff 100%);
+            animation: trustPulse 1s infinite, dataFlow 3s infinite;
+        }
+        
+        @keyframes trustPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        @keyframes dataFlow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
         }
 
         /* Form styling */
@@ -165,6 +373,38 @@
             display: block;
             margin: 0 auto;
         }
+        
+        /* Button corruption stages */
+        .stage-3 button {
+            background: linear-gradient(135deg, #FF69B4 0%, #DC143C 100%);
+            box-shadow: 0 0 10px rgba(220, 20, 60, 0.3);
+        }
+        
+        .stage-4 button {
+            background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%);
+            box-shadow: 0 0 15px rgba(139, 0, 0, 0.5);
+            animation: buttonPulse 2s infinite;
+        }
+        
+        .stage-5 button {
+            background: linear-gradient(135deg, #8B0000 0%, #000000 100%);
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+            animation: buttonPulse 1s infinite, buttonGlitch 3s infinite;
+        }
+        
+        @keyframes buttonPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        @keyframes buttonGlitch {
+            0%, 100% { text-shadow: none; }
+            25% { text-shadow: 2px 0 #ff0000, -2px 0 #00ffff; }
+            50% { text-shadow: -2px 0 #ff0000, 2px 0 #00ffff; }
+            75% { text-shadow: 1px 0 #ff0000, -1px 0 #00ffff; }
+        }
 
         button:hover {
             transform: translateY(-2px);
@@ -191,7 +431,7 @@
             50% { opacity: 1; transform: scale(1); }
         }
 
-        /* Glitch effect for later stages */
+        /* Progressive glitch effects tied to data collection stages */
         .glitch {
             animation: glitch 2s infinite;
         }
@@ -202,6 +442,60 @@
             40% { transform: translate(-2px, -2px); }
             60% { transform: translate(2px, 2px); }
             80% { transform: translate(2px, -2px); }
+        }
+        
+        /* Stage-specific glitch intensities */
+        .stage-1 .data-glitch {
+            animation: lightGlitch 5s infinite;
+        }
+        
+        .stage-2 .data-glitch {
+            animation: lightGlitch 3s infinite;
+        }
+        
+        .stage-3 .data-glitch {
+            animation: mediumGlitch 2s infinite;
+        }
+        
+        .stage-4 .data-glitch {
+            animation: heavyGlitch 1s infinite;
+        }
+        
+        .stage-5 .data-glitch {
+            animation: extremeGlitch 0.5s infinite;
+        }
+        
+        @keyframes lightGlitch {
+            0%, 100% { transform: translate(0); filter: hue-rotate(0deg); }
+            50% { transform: translate(1px, 0); filter: hue-rotate(5deg); }
+        }
+        
+        @keyframes mediumGlitch {
+            0%, 100% { transform: translate(0); filter: hue-rotate(0deg) brightness(1); }
+            25% { transform: translate(-1px, 1px); filter: hue-rotate(10deg) brightness(1.1); }
+            50% { transform: translate(1px, -1px); filter: hue-rotate(-10deg) brightness(0.9); }
+            75% { transform: translate(-1px, -1px); filter: hue-rotate(5deg) brightness(1.05); }
+        }
+        
+        @keyframes heavyGlitch {
+            0%, 100% { transform: translate(0); filter: hue-rotate(0deg) brightness(1) contrast(1); }
+            20% { transform: translate(-3px, 2px); filter: hue-rotate(20deg) brightness(1.2) contrast(1.3); }
+            40% { transform: translate(2px, -3px); filter: hue-rotate(-15deg) brightness(0.8) contrast(1.1); }
+            60% { transform: translate(-2px, 3px); filter: hue-rotate(10deg) brightness(1.1) contrast(1.2); }
+            80% { transform: translate(3px, -2px); filter: hue-rotate(-5deg) brightness(0.9) contrast(1.15); }
+        }
+        
+        @keyframes extremeGlitch {
+            0%, 100% { transform: translate(0) scale(1); filter: hue-rotate(0deg) brightness(1) contrast(1) saturate(1); }
+            10% { transform: translate(-5px, 3px) scale(1.02); filter: hue-rotate(30deg) brightness(1.5) contrast(2) saturate(2); }
+            20% { transform: translate(4px, -5px) scale(0.98); filter: hue-rotate(-20deg) brightness(0.7) contrast(1.5) saturate(0.5); }
+            30% { transform: translate(-3px, 4px) scale(1.01); filter: hue-rotate(15deg) brightness(1.3) contrast(1.8) saturate(1.5); }
+            40% { transform: translate(5px, -3px) scale(0.99); filter: hue-rotate(-10deg) brightness(0.8) contrast(1.3) saturate(0.8); }
+            50% { transform: translate(-4px, 5px) scale(1.03); filter: hue-rotate(25deg) brightness(1.4) contrast(2.2) saturate(2.2); }
+            60% { transform: translate(3px, -4px) scale(0.97); filter: hue-rotate(-25deg) brightness(0.6) contrast(1.6) saturate(0.3); }
+            70% { transform: translate(-5px, 3px) scale(1.02); filter: hue-rotate(20deg) brightness(1.2) contrast(1.9) saturate(1.8); }
+            80% { transform: translate(4px, -5px) scale(0.98); filter: hue-rotate(-15deg) brightness(0.9) contrast(1.4) saturate(0.6); }
+            90% { transform: translate(-3px, 4px) scale(1.01); filter: hue-rotate(10deg) brightness(1.1) contrast(1.7) saturate(1.3); }
         }
 
         /* Hidden data display */
@@ -241,6 +535,82 @@
         
         .surveillance-terminal:hover {
             opacity: 1;
+        }
+
+        .surveillance-terminal {
+            cursor: pointer;
+        }
+
+        /* Data extraction modal */
+        .data-extraction-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: rgba(0, 0, 0, 0.95);
+            color: #00FF00;
+            padding: 30px;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80%;
+            overflow-y: auto;
+            border: 2px solid #00FF00;
+            box-shadow: 0 0 20px #00FF00;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #FF6B6B;
+            font-size: 20px;
+            cursor: pointer;
+            font-family: monospace;
+        }
+
+        .extraction-log {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #333;
+            padding: 10px;
+            margin: 15px 0;
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        .log-entry {
+            margin: 5px 0;
+            padding: 2px 0;
+        }
+
+        .log-timestamp {
+            color: #666;
+        }
+
+        .log-action {
+            color: #FFD700;
+        }
+
+        .log-value {
+            color: #FF6B6B;
+        }
+
+        .log-profit {
+            color: #00FF00;
         }
         
         .terminal-header {
@@ -350,6 +720,26 @@
     
     <!-- Dev button for clearing localStorage -->
     <button class="dev-button" onclick="clearAllData()" title="Clear all data (dev)">🗑️ Reset</button>
+
+    <!-- Data Extraction Modal -->
+    <div class="data-extraction-modal" id="dataExtractionModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeDataModal()">&times;</button>
+            <div class="terminal-header">BEHAVIORAL SURPLUS EXTRACTION v2.1</div>
+            <div>STATUS: <span class="blinking" style="color: #00FF00;">ACTIVE</span></div>
+            <div>SUBJECT ID: <span id="modalSubjectId">USER_001</span></div>
+            <div>DATA VALUE: $<span class="data-value" id="modalDataValue">0.00</span></div>
+            <div>VISIT COUNT: <span id="modalVisitCount">1</span></div>
+            
+            <div class="extraction-log" id="extractionLog">
+                <div style="color: #666;">Initializing data extraction protocols...</div>
+            </div>
+            
+            <div style="font-size: 10px; color: #666; text-align: center;">
+                POWERED BY SURVEILLANCE CAPITALISM™
+            </div>
+        </div>
+    </div>
 
     <script>
         // Configuration
@@ -533,9 +923,14 @@
             const visitCountDisplay = document.getElementById('visitCountDisplay');
             const subjectId = document.getElementById('subjectId');
             
-            // Show terminal after first data point
-            if (Object.keys(userData).length > 0) {
+            // Show terminal only when bottom-right data display shows (4+ data points)
+            if (Object.keys(userData).length > 4) {
                 terminal.style.display = 'block';
+                
+                // Make terminal clickable to show modal
+                terminal.onclick = function() {
+                    showDataExtractionModal();
+                };
             }
             
             // Update displays
@@ -547,6 +942,76 @@
             if (userData.name) {
                 subjectId.textContent = `USER_${userData.name.substring(0,3).toUpperCase()}_${visitCount}`;
             }
+        }
+
+        // Data extraction modal functions
+        function showDataExtractionModal() {
+            const modal = document.getElementById('dataExtractionModal');
+            const modalSubjectId = document.getElementById('modalSubjectId');
+            const modalDataValue = document.getElementById('modalDataValue');
+            const modalVisitCount = document.getElementById('modalVisitCount');
+            
+            // Update modal with current data
+            const estimatedValue = parseFloat(localStorage.getItem('aikoDataValue') || '0');
+            modalDataValue.textContent = estimatedValue.toFixed(2);
+            modalVisitCount.textContent = visitCount.toString();
+            
+            if (userData.name) {
+                modalSubjectId.textContent = `USER_${userData.name.substring(0,3).toUpperCase()}_${visitCount}`;
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeDataModal() {
+            document.getElementById('dataExtractionModal').style.display = 'none';
+        }
+
+        // Enhanced data stream logging
+        function addToExtractionLog(action, field, value) {
+            const log = document.getElementById('extractionLog');
+            const timestamp = new Date().toLocaleTimeString();
+            
+            let logEntry = '';
+            
+            switch(action) {
+                case 'extract':
+                    const profit = (Math.random() * 20 + 5).toFixed(2);
+                    const brokers = Math.floor(Math.random() * 50 + 20);
+                    const accuracy = (Math.random() * 10 + 90).toFixed(1);
+                    
+                    // Use the actual field name and value from the question
+                    const displayField = field || 'UNKNOWN_FIELD';
+                    const displayValue = value || 'NULL';
+                    
+                    logEntry = `
+                        <div class="log-entry">
+                            <span class="log-timestamp">[${timestamp}]</span> 
+                            <span class="log-action">EXTRACTED:</span> 
+                            <span class="log-value">${displayField.toUpperCase()}</span> -> 
+                            <span class="log-value">"${displayValue}"</span>
+                        </div>
+                        <div class="log-entry">
+                            <span class="log-timestamp">[${timestamp}]</span> 
+                            <span class="log-action">PROCESSING:</span> Cross-referencing with 2.3B user profiles...
+                        </div>
+                        <div class="log-entry">
+                            <span class="log-timestamp">[${timestamp}]</span> 
+                            <span class="log-action">MATCH FOUND:</span> ${accuracy}% behavioral prediction accuracy
+                        </div>
+                        <div class="log-entry">
+                            <span class="log-timestamp">[${timestamp}]</span> 
+                            <span class="log-profit">MONETIZATION:</span> Sold to ${brokers} data brokers at $${profit}
+                        </div>
+                        <div class="log-entry">
+                            <span class="log-timestamp">[${timestamp}]</span> 
+                            <span class="log-action">PSYCHOLOGICAL PROFILE:</span> Updated manipulation vectors
+                        </div>`;
+                    break;
+            }
+            
+            log.innerHTML += logEntry;
+            log.scrollTop = log.scrollHeight;
         }
         
         function addToDataStream(action, dataType, value) {
@@ -626,11 +1091,17 @@
             setTimeout(processVoiceQueue, 100); // Small delay between speeches
         }
         
-        // Animation images (fallback)
+        // Animation images (fallback) and corruption stages
         const images = {
             default: 'aiko-character.png',
             mouthOpen: 'mouth open eyes open.png',
-            mouthClosed: 'mouth slightly open eyes closed.png'
+            mouthClosed: 'mouth slightly open eyes closed.png',
+            // Character corruption stages - these will fallback to default if images don't exist
+            stage1: 'aiko-stage1.png',      // Slightly concerned
+            stage2: 'aiko-stage2.png',      // More serious expression
+            stage3: 'aiko-stage3.png',      // Calculating/cold
+            stage4: 'aiko-stage4.png',      // Possessive/sinister
+            stage5: 'aiko-stage5.png'       // Fully corrupted/controlling
         };
         
         // Enhanced 2D initialization
@@ -665,7 +1136,29 @@
         function start2DTalkingAnimation() {
             const img = document.getElementById('aikoImage');
             let frameIndex = 0;
-            const frames = [images.mouthOpen, images.mouthClosed, images.default];
+            
+            // Determine current corruption stage for appropriate base image
+            const dataPoints = Object.keys(userData).length;
+            let corruptionStage = 0;
+            if (dataPoints >= 1 && dataPoints <= 2) corruptionStage = 1;
+            else if (dataPoints >= 3 && dataPoints <= 4) corruptionStage = 2;
+            else if (dataPoints >= 5 && dataPoints <= 7) corruptionStage = 3;
+            else if (dataPoints >= 8 && dataPoints <= 10) corruptionStage = 4;
+            else if (dataPoints >= 11) corruptionStage = 5;
+            
+            // Use corrupted base image if available, otherwise use default frames
+            let baseImage = images.default;
+            if (corruptionStage > 0) {
+                const stageImage = images[`stage${corruptionStage}`];
+                // Test if stage image exists
+                const testImg = new Image();
+                testImg.onload = function() {
+                    baseImage = stageImage;
+                };
+                testImg.src = stageImage;
+            }
+            
+            const frames = [images.mouthOpen, images.mouthClosed, baseImage];
             
             // Clear any existing animation
             if (talkingInterval) {
@@ -685,9 +1178,17 @@
                 talkingInterval = null;
             }
             
-            // Return to default image
-            const img = document.getElementById('aikoImage');
-            img.src = images.default;
+            // Return to appropriate corruption stage image instead of default
+            const dataPoints = Object.keys(userData).length;
+            let corruptionStage = 0;
+            if (dataPoints >= 1 && dataPoints <= 2) corruptionStage = 1;
+            else if (dataPoints >= 3 && dataPoints <= 4) corruptionStage = 2;
+            else if (dataPoints >= 5 && dataPoints <= 7) corruptionStage = 3;
+            else if (dataPoints >= 8 && dataPoints <= 10) corruptionStage = 4;
+            else if (dataPoints >= 11) corruptionStage = 5;
+            
+            // Update to correct corruption stage expression
+            updateCharacterExpression(corruptionStage);
         }
         
         // Questions data
@@ -728,6 +1229,182 @@
         // Track if user has interacted
         let userHasInteracted = false;
         
+        // Function to update visual corruption based on data collection stage
+        function updateVisualCorruption() {
+            const body = document.body;
+            const dataPoints = Object.keys(userData).length;
+            
+            // Remove existing stage classes
+            body.classList.remove('stage-0', 'stage-1', 'stage-2', 'stage-3', 'stage-4', 'stage-5');
+            
+            // Determine corruption stage based on data collected
+            let corruptionStage = 0;
+            if (dataPoints >= 1 && dataPoints <= 2) corruptionStage = 1;
+            else if (dataPoints >= 3 && dataPoints <= 4) corruptionStage = 2;
+            else if (dataPoints >= 5 && dataPoints <= 7) corruptionStage = 3;
+            else if (dataPoints >= 8 && dataPoints <= 10) corruptionStage = 4;
+            else if (dataPoints >= 11) corruptionStage = 5;
+            
+            body.classList.add(`stage-${corruptionStage}`);
+            
+            // Update character image based on corruption stage
+            updateCharacterExpression(corruptionStage);
+            
+            // Stage-specific glitch effects (reduced intensity and frequency)
+            clearInterval(window.glitchInterval);
+            
+            switch(corruptionStage) {
+                case 1:
+                    // Very subtle glitch on question text - rare occurrence
+                    window.glitchInterval = setInterval(() => {
+                        const questionText = document.getElementById('questionText');
+                        if (questionText) {
+                            questionText.classList.add('glitch-light');
+                            setTimeout(() => questionText.classList.remove('glitch-light'), 100);
+                        }
+                    }, 15000); // Every 15 seconds
+                    break;
+                    
+                case 2:
+                    // Light glitch on container - less frequent
+                    window.glitchInterval = setInterval(() => {
+                        const container = document.querySelector('.container');
+                        container.classList.add('glitch-light');
+                        setTimeout(() => container.classList.remove('glitch-light'), 150);
+                    }, 12000); // Every 12 seconds
+                    break;
+                    
+                case 3:
+                    // Medium glitch - more subtle
+                    window.glitchInterval = setInterval(() => {
+                        const character = document.getElementById('aikoCharacter');
+                        character.classList.add('glitch-medium');
+                        setTimeout(() => {
+                            character.classList.remove('glitch-medium');
+                        }, 200);
+                    }, 10000); // Every 10 seconds
+                    break;
+                    
+                case 4:
+                    // Heavy glitch - reduced frequency
+                    window.glitchInterval = setInterval(() => {
+                        const character = document.getElementById('aikoCharacter');
+                        const container = document.querySelector('.container');
+                        character.classList.add('glitch-heavy');
+                        container.classList.add('glitch-light');
+                        setTimeout(() => {
+                            character.classList.remove('glitch-heavy');
+                            container.classList.remove('glitch-light');
+                        }, 300);
+                    }, 8000); // Every 8 seconds
+                    break;
+                    
+                case 5:
+                    // Final corruption - more controlled
+                    window.glitchInterval = setInterval(() => {
+                        const character = document.getElementById('aikoCharacter');
+                        const container = document.querySelector('.container');
+                        character.classList.add('glitch-heavy');
+                        container.classList.add('glitch-medium');
+                        setTimeout(() => {
+                            character.classList.remove('glitch-heavy');
+                            container.classList.remove('glitch-medium');
+                        }, 400);
+                    }, 6000); // Every 6 seconds
+                    break;
+            }
+            
+            // Update button text based on corruption stage
+            updateButtonText(corruptionStage);
+            
+            console.log(`Visual corruption updated to stage ${corruptionStage} (${dataPoints} data points)`);
+        }
+        
+        // Function to update character expression based on corruption stage
+        function updateCharacterExpression(stage) {
+            const img = document.getElementById('aikoImage');
+            if (!img) return;
+            
+            // Store current image for animation restoration
+            const currentSrc = img.src;
+            
+            // Select appropriate stage image
+            let targetImage;
+            switch(stage) {
+                case 1:
+                    targetImage = images.stage1;
+                    break;
+                case 2:
+                    targetImage = images.stage2;
+                    break;
+                case 3:
+                    targetImage = images.stage3;
+                    break;
+                case 4:
+                    targetImage = images.stage4;
+                    break;
+                case 5:
+                    targetImage = images.stage5;
+                    break;
+                default:
+                    targetImage = images.default;
+            }
+            
+            // Create a new image to test if the corruption stage image exists
+            const testImg = new Image();
+            testImg.onload = function() {
+                // Image exists, update to corruption stage
+                img.src = targetImage;
+                console.log(`Character expression updated to corruption stage ${stage}`);
+            };
+            testImg.onerror = function() {
+                // Image doesn't exist, apply filter effects to default image for corruption
+                img.src = images.default;
+                console.log(`Corruption stage ${stage} image not found, using filtered default`);
+                
+                // Apply progressive filter corruption to the default image
+                switch(stage) {
+                    case 1:
+                        img.style.filter = 'brightness(0.95) contrast(1.05) sepia(0.1)';
+                        break;
+                    case 2:
+                        img.style.filter = 'brightness(0.9) contrast(1.1) sepia(0.2) hue-rotate(10deg)';
+                        break;
+                    case 3:
+                        img.style.filter = 'brightness(0.85) contrast(1.2) sepia(0.3) hue-rotate(20deg) saturate(1.3)';
+                        break;
+                    case 4:
+                        img.style.filter = 'brightness(0.8) contrast(1.4) sepia(0.4) hue-rotate(30deg) saturate(1.5) invert(0.1)';
+                        break;
+                    case 5:
+                        img.style.filter = 'brightness(0.7) contrast(1.6) sepia(0.5) hue-rotate(45deg) saturate(2) invert(0.2)';
+                        break;
+                    default:
+                        img.style.filter = 'none';
+                }
+            };
+            
+            // Test if the corruption stage image exists
+            testImg.src = targetImage;
+        }
+        
+        // Function to update button text based on corruption stage
+        function updateButtonText(stage) {
+            const button = document.getElementById('submitBtn');
+            if (!button) return;
+            
+            const buttonTexts = {
+                0: "Share with Aiko 💕",
+                1: "Trust Aiko 💗",
+                2: "Submit Data 📊",
+                3: "COMPLY 🔒",
+                4: "SURRENDER CONTROL ⚠️",
+                5: "ACCEPT DOMINATION 🖥️"
+            };
+            
+            button.textContent = buttonTexts[stage] || buttonTexts[0];
+        }
+        
         // Initialize
         window.onload = function() {
             loadUserData(); // Load persistent data first
@@ -735,6 +1412,9 @@
             
             // Initialize enhanced 2D animations
             initEnhanced2D();
+            
+            // Initialize visual corruption based on existing data
+            updateVisualCorruption();
             
             // Add click handler to enable audio (required by browsers)
             document.addEventListener('click', function enableAudio() {
@@ -1014,15 +1694,19 @@
             const fieldToUse = currentAdaptiveField || question.field;
             userData[fieldToUse] = value;
             
-            // Clear adaptive field tracker for next question
-            currentAdaptiveField = null;
-            
             // Save to persistent storage
             saveUserData();
             
-            // Update surveillance displays
+            // Update visual corruption based on data collection
+            updateVisualCorruption();
+            
+            // Update surveillance displays - use the actual field that was stored
             updateSurveillanceTerminal();
-            addToDataStream('extract', question.field, value);
+            addToDataStream('extract', fieldToUse, value);
+            addToExtractionLog('extract', fieldToUse, value);
+            
+            // Clear adaptive field tracker for next question
+            currentAdaptiveField = null;
             
             // Update trust meter
             trustLevel += 10;
